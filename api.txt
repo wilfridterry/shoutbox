@@ -1,0 +1,15 @@
+## API
+
+GET /api/entries - получение списка записей;
+GET /api/entries/page - получение одной страницы записей;
+POST /api/entry - создание новой записи
+
+## User interface
+
+GET /post - форма для новой записи;
+POST /post - публикация новой записи;
+GET /register - вывод формы регистрации;
+POST /register - создание новой учетки;
+GET /login - вывод новой формы;
+POST /login - вход в приложение;
+GET /logout - выход из приложения;
