@@ -16,7 +16,6 @@ class Entry {
     }
 
     async save (cb) {
-        
         try {
             const client = await getClient();
             const entryJSON = JSON.stringify(this);
@@ -30,18 +29,18 @@ class Entry {
 
      static async getRange(from, to, cb) {
         try {
-        const client = await getClient();
+            const client = await getClient();
 
-        const items = await client.lRange('entries', from, to);
-        let entries = [];
-        
-        items.forEach(element => {
-            entries.push(JSON.parse(element));  
-        });
+            const items = await client.lRange('entries', from, to);
+            let entries = [];
+            
+            items.forEach(element => {
+                entries.push(JSON.parse(element));  
+            });
 
-        cb(null, entries);
+            cb(null, entries);
         } catch (e) {
-        cb(err);
+            cb(err);
         }        
     }
 }
