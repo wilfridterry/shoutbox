@@ -2,18 +2,20 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='public/stylesheets/style.css' />
   </head>
   <body>
     <% include menu %>
     <h1><%= title %></h1>
+    <hr>
     
     <% entries.forEach(entry => {%>
       <div class="entry">
-        <h3><% entry.title %></h3>
-        <p><% entry.body %></p>
-        <p>Posted by <% entry.username %></p>
+        <h3><%= entry.title %></h3>
+        <p><%= entry.body %></p>
+        <p>Posted by <%= entry.username %></p>
       </div>
+      <hr>
     <%})%>
   </body>
 </html>

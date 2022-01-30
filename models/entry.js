@@ -1,6 +1,12 @@
 const redis = require('redis');
 
-const db = redis.createClient();
+
+async function getClient() {
+    const client = redis.createClient();
+    if (!client.connected) await client.connect();
+
+    return client;
+}
 
 class Entry {
     constructor(obj) {
@@ -9,31 +15,34 @@ class Entry {
         }
     }
 
-    save (cb) {
-        const entryJSON = JSON.stringify(this);
+    async save (cb) {
+        
+        try {
+            const client = await getClient();
+            const entryJSON = JSON.stringify(this);
+            await client.lPush('entries', entryJSON);
 
-        db.lPush(
-            'entriens',
-            entryJSON,
-            err => {
-                if (err) return cb(err);
-                cb();
-            }
-        );
+            cb();
+        } catch(e) {
+            cb(e);
+        }
     }
 
-    static getRange(from, to, cb) {
-        db.lRange('entries', from, to, (err, items) => {
-            if (err) cb(err);
+     static async getRange(from, to, cb) {
+        try {
+        const client = await getClient();
 
-            let entries = [];
-
-            items.forEach(element => {
-                entries.push(JSON.parse(item));  
-            });
-
-            cb(null, entries);
+        const items = await client.lRange('entries', from, to);
+        let entries = [];
+        
+        items.forEach(element => {
+            entries.push(JSON.parse(element));  
         });
+
+        cb(null, entries);
+        } catch (e) {
+        cb(err);
+        }        
     }
 }
 
