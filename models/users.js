@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const client = require('../db/redis-client');
+const redis = require('../db/redis-client');
 
 
 class User {
@@ -10,29 +10,28 @@ class User {
     }
 
     async save(cb) {
+        
         if (this.id) {
-           await this.update();
+            await this.update();
         } else {
-            db.incr('user:ids', (err, id) => {
+            const client = await redis();
+            this.id = await client.incr('user:ids');
+
+            this.hashPassword((err) => {
                 if (err) return cb(err);
-                this.id = id;
-                this.hashPassword((err) => {
-                    if (err) return cb(err);
-                    this.update(cb);
-                })
-            });
+                this.update(cb);
+            })
         }
     }
 
     async update(cb) {
-        const id = this.id
-        (await client()).set(`user:id:${this.name}`, id, err => {
-            if (err) return cb(err);
+        const client = await redis();
+        
+        await client.set(`user:id:${this.name}`, this.id);
 
-            db.hmset(`user:${id}`, this, err => {
-                cb(err);
-            });
-        });
+        await client.hSet(`user:${this.id}`, this);
+
+        cb();
     }
 
     async hashPassword(cb) {
@@ -49,6 +48,47 @@ class User {
             });
         });
     }
+
+    static async authenticate(name, pass, cb) {
+        User.getByName(name, (err, user) => {
+            if (err) return cb(err);
+
+            if (!user.id) return cb();
+
+            bcrypt.hash(pass, user.salt, (err, hash) => {
+                if (err) return cb(err);
+
+                if (hash == user.pass) return cb(null, user);
+
+                cb();
+            });
+        });
+    }
+
+    static async getByName(name, cb) {
+        try {
+            const id = await User.getId(name);
+            
+            const user = await User.get(id);
+            
+            cb(null, new User(user));
+        } catch(err) {
+            cb(err);
+        }
+    }
+
+    static async getId(name) {
+        return await (await redis()).get(`user:id:${name}`);
+    }
+
+    static async get(id) {
+        return await (await redis()).hGetAll(`user:${id}`);
+    }
 }
 
 module.exports = User;
+
+User.getByName('Title', (err, user) => {
+    if (err) console.log(err);
+    console.log(user);
+});
