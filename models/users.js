@@ -87,8 +87,3 @@ class User {
 }
 
 module.exports = User;
-
-User.getByName('Title', (err, user) => {
-    if (err) console.log(err);
-    console.log(user);
-});
