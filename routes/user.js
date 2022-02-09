@@ -29,4 +29,31 @@ router.post('/register', [], (req, res, next) => {
     });
 });
 
+router.get('/login', [], (req, res, next) => {
+    res.render('login', { title: 'Login' });
+});
+
+router.post('/login', [], (req, res, next) => {
+    const data = req.body.user;
+
+    User.authenticate(data.name, data.pass, (err, user) => {
+        if (err) throw err;
+
+        if (user) {
+            req.session.uid = user.id;
+            res.redirect('/');
+        } else {
+            res.error('Sorry! Invalid credentials.');
+            res.redirect('back');
+        }
+    });
+});
+
+router.get('/logout', [], (req, res) => {
+    req.session.destroy((err) => {
+        if (err) throw err;
+        res.redirect('/');
+    });
+});
+
 module.exports = router;

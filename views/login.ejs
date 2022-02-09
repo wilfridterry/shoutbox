@@ -11,18 +11,20 @@
 <body>
     <% include menu %>
     <h1><%= title %></h1>
-    <p>Fill in the form below to sign up!</p>
+    <p>Fill in the form below to sing in</p>
+
     <% include messages %>
 
-    <form action="/register" method="POST">
+    <form action="/login" method="POST">
         <p>
             <input type="text" name="user[name]" placeholder="Username">
         </p>
+
         <p>
-            <input type="password" name="user[pass]">
+            <input type="text" name="user[pass]" placeholder="Password">
         </p>
         <p>
-            <input type="submit" value="Sing Up">
+            <input type="submit" value="Login">
         </p>
     </form>
 </body>

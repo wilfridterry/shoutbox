@@ -9,6 +9,7 @@ const indexRouter = require('./routes/index');
 const postRouter = require('./routes/post');
 const userRouter = require('./routes/user');
 const messages = require('./middleware/messages');
+const user = require('./middleware/user');
 
 const app = express();
 
@@ -27,6 +28,8 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+
+app.use(user);
 app.use(messages);
 
 app.use('/', indexRouter);
