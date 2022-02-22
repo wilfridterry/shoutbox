@@ -10,6 +10,7 @@ const postRouter = require('./routes/post');
 const userRouter = require('./routes/user');
 const messages = require('./middleware/messages');
 const user = require('./middleware/user');
+const api = require('./routes/api');
 
 const app = express();
 
@@ -29,9 +30,11 @@ app.use(session({
   saveUninitialized: true
 }));
 
+app.use('/api', api.auth);
 app.use(user);
 app.use(messages);
 
+app.use('/api', api.router);
 app.use('/', indexRouter);
 app.use('/post', postRouter);
 app.use('/', userRouter);

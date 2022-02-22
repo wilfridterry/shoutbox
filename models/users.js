@@ -29,7 +29,7 @@ class User {
         
         await client.set(`user:id:${this.name}`, this.id);
 
-        await client.hSet(`user:${this.id}`, this);
+        await client.hSet(this.id, `user:${this.id}`, this);
 
         cb();
     }
