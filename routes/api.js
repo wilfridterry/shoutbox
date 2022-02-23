@@ -1,7 +1,7 @@
 const express = require('express');
 const auth = require('basic-auth');
 const User = require('../models/users');
-
+const Entry = require('../models/entry');
 var router = express.Router();
 
 
@@ -25,8 +25,20 @@ router.get('/users/:id', async (req, res, next) => {
     }
 });
 
-router.get('/entries/:page?', (req, res, next) => {
+router.get('/entries/:page?', [page(Entry.count)], (req, res, next) => {
+    const page = req.page;
 
+    Entry.getRange(page.from, page.to, (err, entries) => {
+        if (err) return next(err);
+        res.format({
+            json: () => {
+                res.send(entries);
+            },
+            xml: () => {
+                res.render('entries/x m l', { entries: entries });
+            }
+        });
+    });
 });
 
 router.post('entries', (req, res, next) => {
