@@ -29,7 +29,7 @@ class User {
         
         await client.set(`user:id:${this.name}`, this.id);
 
-        await client.hSet(this.id, `user:${this.id}`, this);
+        await client.hSet(`user:${this.id}`, 'user', JSON.stringify(this));
 
         cb();
     }
@@ -69,8 +69,10 @@ class User {
         try {
             const id = await User.getId(name);
             
-            const user = await User.get(id);
-            
+            const data = await User.get(id);
+
+            const user = JSON.parse(data.user ?? '{}');
+
             cb(null, new User(user));
         } catch(err) {
             cb(err);
@@ -83,6 +85,13 @@ class User {
 
     static async get(id) {
         return await (await redis()).hGetAll(`user:${id}`);
+    }
+
+    toJson() {
+        return {
+            id: this.id,
+            name: this.name
+        }
     }
 }
 
